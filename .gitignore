@@ -1,0 +1,5 @@
+local.mk
+*.o
+*.d
+*.json
+euler

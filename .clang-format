@@ -1,0 +1,12 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 3
+TabWidth: 3
+UseTab: AlignWithSpaces
+ColumnLimit: 80
+AlignAfterOpenBracket: AlwaysBreak
+AllowShortFunctionsOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: OnePerLine
+BreakBeforeBraces: WebKit
+BreakBeforeTernaryOperators: true
