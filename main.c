@@ -5,6 +5,7 @@
 static int64_t (*problems[])() = {
 	problem1,
 	problem2,
+	problem3,
 };
 constexpr auto num_problems = sizeof problems / sizeof problems[0];
 
