@@ -3,7 +3,7 @@
 
 int main()
 {
-	int64_t result = problem1();
+	int64_t result = problem2();
 	printf("%lld\n", result);
 
 	return 0;
