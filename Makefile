@@ -3,7 +3,7 @@
 include defaults.mk
 -include local.mk
 
-objects = main.o
+objects = main.o problems/1.o
 deps := $(objects:%.o=%.d)
 compilation_db := $(objects:%.o=%.json)
 
@@ -31,6 +31,9 @@ uninstall:
 
 euler: $(objects)
 	$(CC) $(CFLAGS_all) $(LDFLAGS_all) -o $@ $^
+
+run: euler
+	./euler
 
 .SUFFIXES:
 .SUFFIXES: .c .o .json

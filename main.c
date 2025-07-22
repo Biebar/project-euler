@@ -1,6 +1,10 @@
+#include "problems/problems.h"
 #include <stdio.h>
 
-int main() {
-  printf("Hello World!\n");
-  return 0;
+int main()
+{
+	int64_t result = problem1();
+	printf("%lld\n", result);
+
+	return 0;
 }
