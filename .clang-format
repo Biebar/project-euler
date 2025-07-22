@@ -1,5 +1,5 @@
 ---
-Standard: c23
+Standard: c++14
 BasedOnStyle: LLVM
 IndentWidth: 3
 TabWidth: 3
