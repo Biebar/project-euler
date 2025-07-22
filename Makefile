@@ -62,7 +62,7 @@ remove-old-files: .generated_files.txt
 	rm -fv $$(comm -13 $@.tmp $@)
 	@mv $@.tmp $@
 
-$(objects_all) $(compilation_db): defaults.mk local.mk
+$(objects) $(compilation_db): defaults.mk local.mk
 local.mk:
 	touch $@
 
