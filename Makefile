@@ -3,7 +3,7 @@
 include defaults.mk
 -include local.mk
 
-objects = main.o problems/1.o problems/2.o problems/3.o utils/factors.o
+objects = main.o problems/1.o problems/2.o problems/3.o problems/4.o utils/factors.o
 deps := $(objects:%.o=%.d)
 compilation_db := $(objects:%.o=%.json)
 
