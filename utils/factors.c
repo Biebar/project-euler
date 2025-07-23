@@ -1,4 +1,5 @@
 #include "factors.h"
+#include "unequality.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -52,4 +53,39 @@ int64_t largest_prime_factor(int64_t n)
 	}
 	assert(n % ret == 0);
 	return ret;
+}
+
+bool is_prime(int64_t n)
+{
+	return smallest_prime_factor(n) == n;
+}
+
+static inline void swap(int64_t *a, int64_t *b)
+{
+	int64_t tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+int64_t greatest_common_divisor(int64_t a, int64_t b)
+{
+	if (a < 0)
+		a *= -1;
+	if (b < 0)
+		b *= -1;
+	if (a < b)
+		swap(&a, &b);
+	while (b != 0) {
+		int64_t rem = a % b;
+		a = b;
+		b = rem;
+	}
+	return a;
+}
+int64_t least_common_multiple(int64_t a, int64_t b)
+{
+	int64_t gcd = greatest_common_divisor(a, b);
+	if (gcd == 0)
+		return 1;
+	int64_t lcm = iabs((a / gcd) * b);
+	return lcm;
 }

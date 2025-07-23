@@ -2,3 +2,6 @@
 2
 3
 4
+5
+6_sum_square_difference
+7_10001st_prime
