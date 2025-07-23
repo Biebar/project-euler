@@ -1,4 +1,4 @@
-#include "problems.h"
+#include <stdint.h>
 
 int64_t problem1()
 {

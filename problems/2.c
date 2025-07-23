@@ -1,4 +1,4 @@
-#include "problems.h"
+#include <stdint.h>
 
 typedef struct vec2 vec2;
 struct vec2 {
@@ -13,8 +13,7 @@ static inline vec2 next(vec2 f)
 int64_t problem2()
 {
 	int64_t sum = 0;
-	for (vec2 f = (vec2){0, 1}; f.second < 4'000'000; f = next(f))
-	{
+	for (vec2 f = (vec2){0, 1}; f.second < 4000000; f = next(f)) {
 		if (f.second % 2 == 0)
 			sum += f.second;
 	}

@@ -1,5 +1,4 @@
 #include "../utils/factors.h"
-#include "problems.h"
 #include <stdint.h>
 
 int64_t problem3()
