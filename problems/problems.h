@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-int64_t problem1();
-int64_t problem2();
-int64_t problem3();
-int64_t problem4();
+#include "problem_func_declarations.h"
 
 #endif // EULER_PROBLEM_PROBLEMS_H

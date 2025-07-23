@@ -1,14 +1,6 @@
-#include "problems/problems.h"
+#include "problems/list.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-static int64_t (*problems[])() = {
-	 problem1,
-	 problem2,
-	 problem3,
-	 problem4,
-};
-constexpr auto num_problems = sizeof problems / sizeof problems[0];
 
 void usage(char const program[static 1])
 {

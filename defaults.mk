@@ -10,7 +10,7 @@ CFLAGS_warnings1 = -Wall -Wextra
 
 LDFLAGS =
 
-CPPFLAGS =
+CPPFLAGS = -I.
 CPPFLAGS_deps = -MMD -MP
 CPPFLAGS_testing0 =
 CPPFLAGS_testing1 =
