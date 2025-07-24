@@ -1,6 +1,7 @@
 #include "divisibility.h"
 #include "unequality.h"
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef struct int_and_square int_and_square;
@@ -30,6 +31,7 @@ static int_and_square inc_int_and_square(int_and_square x)
 int64_t smallest_prime_factor(int64_t n)
 {
 	assert(n != INT64_MAX);
+	assert(n > 1);
 	int64_t ret = 0;
 	for (int_and_square i = {2, 4}; i.square <= n; i = inc_int_and_square(i)) {
 		if (n % i.val == 0) {
@@ -88,4 +90,26 @@ int64_t least_common_multiple(int64_t a, int64_t b)
 		return 1;
 	int64_t lcm = iabs((a / gcd) * b);
 	return lcm;
+}
+
+int64_t tmp_name(int64_t n, int64_t p)
+{
+	int64_t res = 0;
+	for (; n % p == 0; n = n / p)
+		res++;
+	return res;
+}
+
+int64_t number_of_factors(int64_t n)
+{
+	assert(n > 0);
+	int64_t res = 1;
+	while (n != 1) {
+		int64_t const p = smallest_prime_factor(n);
+		int64_t const k = tmp_name(n, p);
+		res *= k + 1;
+		for (int64_t i = 0; i < k; ++i)
+			n /= p;
+	}
+	return res;
 }
