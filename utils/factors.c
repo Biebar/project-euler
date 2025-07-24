@@ -1,4 +1,4 @@
-#include "factors.h"
+#include "divisibility.h"
 #include "unequality.h"
 #include <assert.h>
 #include <stdint.h>

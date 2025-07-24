@@ -1,4 +1,4 @@
-#include "../utils/factors.h"
+#include "../utils/divisibility.h"
 #include <stdint.h>
 
 int64_t problem5()
