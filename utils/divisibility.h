@@ -1,5 +1,5 @@
-#ifndef EULER_UTIL_FACTORS_H
-#define EULER_UTIL_FACTORS_H
+#ifndef EULER_UTIL_DIVISIVILITY_H
+#define EULER_UTIL_DIVISIVILITY_H
 
 #include <stdint.h>
 
@@ -9,4 +9,4 @@ bool is_prime(int64_t n);
 int64_t least_common_multiple(int64_t a, int64_t b);
 int64_t greatest_common_divisor(int64_t a, int64_t b);
 
-#endif // EULER_UTIL_FACTORS_H
+#endif // EULER_UTIL_DIVISIVILITY_H

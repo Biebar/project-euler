@@ -4,7 +4,7 @@ all:
 include defaults.mk
 -include local.mk
 
-objects = main.o utils/factors.o utils/unequality.o utils/reductions.o
+objects = main.o utils/divisibility.o utils/unequality.o utils/reductions.o
 
 problems.mk: problems.txt
 	echo 'objects += \' >$@
