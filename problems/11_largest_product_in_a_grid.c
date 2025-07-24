@@ -1,3 +1,4 @@
+#include "../utils/reductions.h"
 #include "../utils/unequality.h"
 #include <assert.h>
 #include <stddef.h>
@@ -46,51 +47,24 @@ constexpr int64_t grid[len][len] = {
      33, 48, 61, 43, 52, 1,  89, 19, 67, 48},
 };
 
-static int64_t prod(
-	 size_t window, size_t stride, int64_t const data[(window - 1) * stride + 1])
-{
-	assert(stride > 0);
-	size_t const end = window * stride;
-	int64_t prod = 1;
-	for (size_t i = 0; i < end; i += stride) {
-		prod *= data[i];
-	}
-	return prod;
-}
-
-static int64_t max_prod(
-	 size_t len,
-	 size_t stride,
-	 int64_t const data[(len - 1) * stride + 1],
-	 size_t window_size)
-{
-	assert(stride > 0);
-	int64_t max_prod = INT64_MIN;
-	if (len + 1 < window_size)
-		return max_prod;
-	size_t const end = (len - window_size + 1) * stride;
-	for (size_t i = 0; i < end; i += stride) {
-		max_prod = max(max_prod, prod(window_size, stride, &data[i]));
-	}
-	return max_prod;
-}
-
 int64_t problem11_largest_product_in_a_grid()
 {
 	size_t input = 4;
 	int64_t output = INT64_MIN;
 	for (size_t i = 0; i < len; ++i) {
 		// Lines
-		output = max(output, max_prod(len, 1, &grid[i][0], input));
+		output = max(output, array_max_prod(len, 1, &grid[i][0], input));
 		// Columns
-		output = max(output, max_prod(len, len, &grid[0][i], input));
+		output = max(output, array_max_prod(len, len, &grid[0][i], input));
 		// Diagonal, upper left to lower right
-		output = max(output, max_prod(len - i, len + 1, &grid[0][i], input));
-		output = max(output, max_prod(len - i, len + 1, &grid[i][0], input));
-		// Diagonal, upper right to lower left
-		output = max(output, max_prod(i + 1, len - 1, &grid[0][i], input));
 		output =
-			 max(output, max_prod(len - i, len - 1, &grid[i][len - 1], input));
+			 max(output, array_max_prod(len - i, len + 1, &grid[0][i], input));
+		output =
+			 max(output, array_max_prod(len - i, len + 1, &grid[i][0], input));
+		// Diagonal, upper right to lower left
+		output = max(output, array_max_prod(i + 1, len - 1, &grid[0][i], input));
+		output = max(
+			 output, array_max_prod(len - i, len - 1, &grid[i][len - 1], input));
 	}
 	return output;
 }
