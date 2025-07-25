@@ -17,7 +17,7 @@ TEST(test_infrastructure_works_correctly)
 
 struct test {
 	const char *name;
-	bool (*fun)();
+	struct test_result (*fun)();
 };
 
 constexpr struct test tests[] = {
@@ -33,11 +33,12 @@ int main()
 	size_t successes = 0;
 	for (size_t i = 0; i < tests_num; ++i) {
 		fprintf(stderr, "Testing %s...", tests[i].name);
-		if (tests[i].fun()) {
+		struct test_result const result = tests[i].fun();
+		if (result.success) {
 			fprintf(stderr, "OK\n");
 			successes++;
 		} else {
-			fprintf(stderr, "Failed\n");
+			fprintf(stderr, "Failed\n%s\n", result.message);
 		}
 	}
 	fprintf(stderr, "%zu/%zu successes\n", successes, tests_num);
