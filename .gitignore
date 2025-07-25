@@ -3,3 +3,9 @@ local.mk
 *.d
 *.json
 euler
+unit_tests
+/.compile_commands.json.tmp
+/.generated_files.txt
+problems.h
+problems.mk
+tests_list.h
