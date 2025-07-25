@@ -13,7 +13,7 @@ LDFLAGS =
 CPPFLAGS = -I.
 CPPFLAGS_deps = -MMD -MP
 CPPFLAGS_testing0 =
-CPPFLAGS_testing1 =
+CPPFLAGS_testing1 = -DTESTING
 CPPFLAGS_asserts0 = -DNDEBUG
 CPPFLAGS_asserts1 =
 
