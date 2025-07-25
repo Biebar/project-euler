@@ -20,6 +20,7 @@ inline VEC_TYPE *VEC_FUN(push)(struct VEC_NAME *vec)
 		VEC_FUN(grow)(vec);
 	return &vec->data[vec->len++];
 }
+void VEC_FUN(destroy)(struct VEC_NAME *vec);
 
 #ifdef VEC_IMPL
 #include "unequality.h"
@@ -44,6 +45,11 @@ err:
 	exit(EXIT_FAILURE);
 }
 extern VEC_TYPE *VEC_FUN(push)(struct VEC_NAME *vec);
+void VEC_FUN(destroy)(struct VEC_NAME *vec)
+{
+	free(vec->data);
+	*vec = (struct VEC_NAME){};
+}
 #endif
 #undef VEC_FUN
 #undef VEC_NAME
