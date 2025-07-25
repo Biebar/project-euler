@@ -8,7 +8,7 @@ LDFLAGS_all := $(LDFLAGS)
 CFLAGS_all := $(CFLAGS) $(CFLAGS_warnings$(ENABLE_WARNINGS))
 CPPFLAGS_all := $(CPPFLAGS_deps) $(CPPFLAGS_testing$(ENABLE_TESTING)) $(CPPFLAGS_asserts$(ENABLE_ASSERTS)) $(CPPFLAGS)
 
-objects_lib = utils/divisibility.o utils/unequality.o utils/reductions.o utils/vec.o
+objects_lib = utils/divisibility.o utils/unequality.o utils/reductions.o utils/vec.o utils/bigint.o
 objects_exe = main.o
 objects_test = test.o
 objects_problems =
