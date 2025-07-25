@@ -37,7 +37,11 @@ void VEC_FUN(grow)(struct VEC_NAME *vec)
 	if (!new_data)
 		goto err;
 
-	memcpy(new_data, vec->data, vec->len * sizeof vec->data[0]);
+	if (vec->len)
+		memcpy(new_data, vec->data, vec->len * sizeof vec->data[0]);
+	if (vec->cap && vec->data)
+		free(vec->data);
+
 	vec->data = new_data;
 	vec->cap = new_cap;
 	return;
