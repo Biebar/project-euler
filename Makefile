@@ -16,7 +16,7 @@ include problems.mk
 deps := $(objects:%.o=%.d)
 compilation_db := $(objects:%.o=%.json)
 
-files_all := $(objects) $(deps) $(compilation_db) euler compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problem_func_names.txt problem_func_declarations.h
+files_all := $(objects) $(deps) $(compilation_db) euler compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h
 
 LDFLAGS_all := $(LDFLAGS)
 CFLAGS_all := $(CFLAGS) $(CFLAGS_warnings$(ENABLE_WARNINGS))
@@ -45,12 +45,10 @@ euler: $(objects)
 run: build
 	./euler
 
-generated_sources: problem_func_names.txt problem_func_declarations.h
+generated_sources: problems.h
 
-problem_func_names.txt: problems.txt
-	sed 's/\(.*\)/problem\1,/' $^ >$@
-problem_func_declarations.h: problems.txt
-	sed 's/\(.*\)/int64_t problem\1();/' $^ >$@
+problems.h: problems.txt
+	sed 's/\(.*\)/PROBLEM_DISPATCH(\1)/' $^ >$@
 
 .SUFFIXES:
 .SUFFIXES: .c .o .json
