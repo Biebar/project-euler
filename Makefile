@@ -24,7 +24,7 @@ objects_all := $(objects_lib) $(objects_exe) $(objects_test) $(objects_problems)
 deps := $(objects_all:%.o=%.d)
 compilation_db := $(objects_all:%.o=%.json)
 
-files_all := $(objects_all) $(deps) $(compilation_db) euler compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h
+files_all := $(objects_all) $(deps) $(compilation_db) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h
 
 build: remove-old-files .WAIT generated_sources .WAIT compile_commands.json euler
 build_tests: remove-old-files .WAIT generated_sources .WAIT compile_commands.json unit_tests
