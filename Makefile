@@ -15,7 +15,7 @@ objects_problems =
 
 problems.mk: problems.txt
 	echo 'objects_problems += \' >$@
-	sed 's_\(.*\)_    problems/\1.o \\_' $^ >>$@
+	sed -e '/^#/d' -e 's_\(.*\)_    problems/\1.o \\_' $^ >>$@
 	echo >>$@
 # my editor thinks the quotes above are unbalanced so here's one
 include problems.mk
@@ -57,10 +57,10 @@ check: build_tests
 generated_sources: problems.h tests_list.h
 
 problems.h: problems.txt
-	sed 's/\(.*\)/PROBLEM_DISPATCH(\1)/' $^ >$@
+	sed -e '/^#/d' -e 's/\(.*\)/PROBLEM_DISPATCH(\1)/' $^ >$@
 
 tests_list.h: tests.txt
-	sed 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
+	sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
 
 .SUFFIXES:
 .SUFFIXES: .c .o .json
