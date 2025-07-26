@@ -8,6 +8,7 @@
 
 TEST(test_infrastructure_works_correctly)
 {
+	TEST_ASSERT(1 == 1);
 	TEST_COMPLETE();
 }
 
