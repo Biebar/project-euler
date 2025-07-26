@@ -7,7 +7,11 @@
 
 typedef uvec bigint;
 
+void bigint_normalize(bigint *a);
+int bigint_cmp(bigint a, bigint b);
 void bigint_sum(bigint *dest, bigint a, bigint b);
+void bigint_diff(bigint *dest, bigint a, bigint b);
+void bigint_copy(bigint *dest, bigint source);
 inline bigint bigint_create(uint64_t value)
 {
 	bigint ret = {};

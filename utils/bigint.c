@@ -42,6 +42,12 @@ struct mult_result mult(uint64_t a, uint64_t b)
 	return ret;
 }
 
+void bigint_normalize(bigint *a)
+{
+	for (size_t i = a->len - 1; i != SIZE_MAX && !a->data[i]; --i) {
+		--a->len;
+	}
+}
 void bigint_sum(bigint *dest, bigint a, bigint b)
 {
 	bigint output = *dest;
@@ -70,6 +76,25 @@ void bigint_sum(bigint *dest, bigint a, bigint b)
 	}
 
 	*dest = output;
+}
+void bigint_diff(bigint *dest, bigint a, bigint b)
+{
+	assert(bigint_cmp(a, b) >= 0);
+	dest->len = 0;
+	uint64_t carry = 0;
+	for (size_t i = 0; i < b.len; ++i) {
+		uint64_t res;
+		carry = ckd_sub(&res, a.data[i], carry);
+		carry += ckd_sub(&res, res, b.data[i]);
+		*uvec_push(dest) = res;
+	}
+	for (size_t i = b.len; i < a.len; ++i) {
+		uint64_t res;
+		carry = ckd_sub(&res, a.data[i], carry);
+		*uvec_push(dest) = res;
+	}
+	assert(!carry); // because a >= b
+	bigint_normalize(dest);
 }
 void bigint_add_monome(bigint *a, uint64_t b, size_t power)
 {
@@ -105,6 +130,27 @@ void bigint_mult_monome(bigint *dest, bigint a, uint64_t b, size_t power)
 	*dest = output;
 }
 
+int bigint_cmp(bigint a, bigint b)
+{
+	if (a.len < b.len)
+		return -1;
+	if (a.len > b.len)
+		return 1;
+	for (size_t i = a.len - 1; i != SIZE_MAX; --i) {
+		if (a.data[i] < b.data[i])
+			return -1;
+		else if (a.data[i] > b.data[i])
+			return 1;
+	}
+	return 0;
+}
+
+void bigint_copy(bigint *dest, bigint source)
+{
+	dest->len = 0;
+	for (size_t i = 0; i < source.len; ++i)
+		*uvec_push(dest) = source.data[i];
+}
 extern inline bigint bigint_create(uint64_t value);
 extern inline void bigint_destroy(bigint *x);
 
@@ -235,6 +281,63 @@ TEST(multiplying_bigint_by_monome_can_carry_over_multiple_digits)
 	TEST_ASSERT(res.data[1] == 1);
 	TEST_ASSERT(res.data[2] == 1);
 	TEST_ASSERT(res.data[3] == 1);
+	TEST_COMPLETE();
+}
+TEST(sub_bigint_by_zero_does_nothing)
+{
+	bigint res = {};
+	bigint a = bigint_create(1);
+	bigint zero = {};
+	bigint_diff(&res, a, zero);
+	TEST_ASSERT(res.len == a.len);
+	TEST_ASSERT(res.data[0] == a.data[0]);
+	TEST_COMPLETE();
+}
+TEST(sub_bigint_by_itself_returns_zero)
+{
+	bigint res = {};
+	bigint a = bigint_create(1);
+	bigint_diff(&res, a, a);
+	TEST_ASSERT(res.len == 0);
+	TEST_COMPLETE();
+}
+TEST(sub_bigint_may_carry)
+{
+	bigint res = {};
+	bigint a = bigint_create(0);
+	*uvec_push(&a) = 1;
+	bigint b = bigint_create(1);
+	bigint_diff(&res, a, b);
+	TEST_ASSERT(res.len == 1);
+	TEST_ASSERT(res.data[0] == BIGINT_DIGIT_MAX);
+	TEST_COMPLETE();
+}
+TEST(sub_bigint_may_carry_over_multiple_digits)
+{
+	bigint res = {};
+	bigint a = bigint_create(0);
+	*uvec_push(&a) = 0;
+	*uvec_push(&a) = 1;
+	bigint b = bigint_create(1);
+	bigint_diff(&res, a, b);
+	TEST_ASSERT(res.len == 2);
+	TEST_ASSERT(res.data[0] == BIGINT_DIGIT_MAX);
+	TEST_ASSERT(res.data[1] == BIGINT_DIGIT_MAX);
+	TEST_COMPLETE();
+}
+TEST(normalizing_normalized_bigint_does_nothing)
+{
+	bigint n = bigint_create(0);
+	*uvec_push(&n) = 1;
+	bigint_normalize(&n);
+	TEST_ASSERT(n.len == 2);
+	TEST_COMPLETE();
+}
+TEST(normalized_bigint_zero_is_empty_vector)
+{
+	bigint n = bigint_create(0);
+	bigint_normalize(&n);
+	TEST_ASSERT(n.len == 0);
 	TEST_COMPLETE();
 }
 #endif // TESTING
