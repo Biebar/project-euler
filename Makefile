@@ -35,13 +35,13 @@ clean-local.mk:
 	[ ! -f local.mk -o -s local.mk ] || rm -fv local.mk
 
 install: installdirs
-	$(INSTALL) output $(DESTDIR)$(BINDIR)/output
+	$(INSTALL) euler $(DESTDIR)$(BINDIR)/euler
 
 installdirs:
 	mkdir -p $(DESTDIR)$(BINDIR)
 
 uninstall:
-	rm -f $(DESTDIR)$(BINDIR)/output
+	rm -f $(DESTDIR)$(BINDIR)/euler
 
 euler: $(objects_exe) $(objects_lib) $(objects_problems)
 unit_tests: $(objects_test) $(objects_lib) $(objects_problems)
