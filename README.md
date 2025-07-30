@@ -31,10 +31,9 @@ Note that the `local.mk` option file can be created in the build directory, in o
 You may build and run the tests with the following commands.
 ```bash
 $ make ENABLE_TESTING=1 build_tests
-$ ./unit_tests
-$ # Alternatively, make ENABLE_TESTING=1 check
+$ make ENABLE_TESTING=1 check
 ```
-Note that these commands may not rebuild the objects files, which would result in an error. You may force rebuilding by using `make clean` or by adding `ENABLE_TESTING = 1` to `local.mk`
+Note that these commands may not rebuild the objects files if they were already build with `ENABLE_TESTING=0`, which would result in an error. You may force rebuilding by using `make clean` or by adding `ENABLE_TESTING = 1` to `local.mk`
 
 ## Adding solutions to a new problem
 
@@ -43,5 +42,6 @@ You may read any file in this directory to find an example.
 
 ## Adding a unit test
 
-You may add a unit test by adding its name in `tests.txt`, then defining the test in any c file when the macro TESTING is defined.
+You may add a unit test in any file except `main.c`, conditonal on the
+preprocessor macro `TESTING` being defined.
 To see how to write a test, find the example test `test_infrastructure_works_correctly` in `test.c`

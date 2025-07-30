@@ -19,18 +19,12 @@ problems.mk: problems.txt
 	echo >>$@
 include problems.mk
 
-test_targets=
-tests.mk: tests.txt
-	echo 'test_targets += \' >$@
-	sort $^ | sed -e '/^#/d' -e 's/\(.*\)/    \1 \\/' $^ >>$@
-	echo >>$@
-include tests.mk
-
 objects_all := $(objects_lib) $(objects_exe) $(objects_test) $(objects_problems)
 deps := $(objects_all:%.o=%.d)
 compilation_db := $(objects_all:%.o=%.json)
+test_lists := $(objects_all:%.o=%.tests)
 
-files_all := $(objects_all) $(deps) $(compilation_db) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h
+files_all := $(objects_all) $(deps) $(compilation_db) $(test_lists) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h tests.txt
 
 build: remove-old-files .WAIT generated_sources .WAIT compile_commands.json euler
 build_tests: remove-old-files .WAIT generated_sources .WAIT compile_commands.json unit_tests
@@ -57,9 +51,8 @@ euler unit_tests:
 
 run: build
 	./euler
-check: $(test_targets)
-$(test_targets): build_tests
-	@./unit_tests --test=$@
+check: build_tests tests.txt
+	for t in $$(cat tests.txt); do ./unit_tests --test=$$t || exit $$?; done
 
 generated_sources: problems.h tests_list.h
 
@@ -67,13 +60,18 @@ problems.h: problems.txt
 	sed -e '/^#/d' -e 's/\(.*\)/PROBLEM_DISPATCH(\1)/' $^ >$@
 
 tests_list.h: tests.txt
-	sort $^ | sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' >$@
+	sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
 
 .SUFFIXES:
-.SUFFIXES: .c .o .json
+.SUFFIXES: .c .o .json .tests
 
 .c.o:
 	$(CC) $(CFLAGS_all) $(CPPFLAGS_all) -c -o $@ $<
+
+tests.txt: $(test_lists)
+	sort -m $^ >$@
+.c.tests:
+	sed -e '/^[ \t]*TEST(\(.*\))$$/!d' -e 's/^[ \t]*TEST(\(.*\))$$/\1/' $< | sort >$@
 
 compile_commands.json: .compile_commands.json.tmp
 	@echo '[' >$@
@@ -101,4 +99,4 @@ local.mk:
 	touch $@
 
 -include $(deps)
-.PHONY: all build build_tests clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources $(test_targets)
+.PHONY: all build build_tests clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources
