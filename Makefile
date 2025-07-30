@@ -29,6 +29,8 @@ files_all := $(objects_all) $(deps) $(compilation_db) $(test_lists) euler unit_t
 build: remove-old-files .WAIT generated_sources .WAIT compile_commands.json euler
 build_tests: remove-old-files .WAIT generated_sources .WAIT compile_commands.json unit_tests
 
+dev: remove-old-files .WAIT generated_sources compile_commands.json
+
 clean: remove-old-files clean-local.mk
 	rm -fv $(files_all)
 clean-local.mk:
@@ -99,4 +101,4 @@ local.mk:
 	touch $@
 
 -include $(deps)
-.PHONY: all build build_tests clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources
+.PHONY: all build build_tests dev clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources
