@@ -17,8 +17,14 @@ problems.mk: problems.txt
 	echo 'objects_problems += \' >$@
 	sed -e '/^#/d' -e 's_\(.*\)_    problems/\1.o \\_' $^ >>$@
 	echo >>$@
-# my editor thinks the quotes above are unbalanced so here's one
 include problems.mk
+
+test_targets=
+tests.mk: tests.txt
+	echo 'test_targets += \' >$@
+	sort $^ | sed -e '/^#/d' -e 's/\(.*\)/    \1 \\/' $^ >>$@
+	echo >>$@
+include tests.mk
 
 objects_all := $(objects_lib) $(objects_exe) $(objects_test) $(objects_problems)
 deps := $(objects_all:%.o=%.d)
@@ -51,8 +57,9 @@ euler unit_tests:
 
 run: build
 	./euler
-check: build_tests
-	./unit_tests
+check: $(test_targets)
+$(test_targets): build_tests
+	@./unit_tests --test=$@
 
 generated_sources: problems.h tests_list.h
 
@@ -60,7 +67,7 @@ problems.h: problems.txt
 	sed -e '/^#/d' -e 's/\(.*\)/PROBLEM_DISPATCH(\1)/' $^ >$@
 
 tests_list.h: tests.txt
-	sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
+	sort $^ | sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' >$@
 
 .SUFFIXES:
 .SUFFIXES: .c .o .json
@@ -94,4 +101,4 @@ local.mk:
 	touch $@
 
 -include $(deps)
-.PHONY: all build build_tests clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources
+.PHONY: all build build_tests clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources $(test_targets)
