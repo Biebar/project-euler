@@ -13,6 +13,8 @@ objects_exe = main.o
 objects_test = test.o
 objects_problems =
 
+generated_headers = problems.h tests_list.h
+
 problems.mk: problems.txt
 	echo 'objects_problems += \' >$@
 	sed -e '/^#/d' -e 's_\(.*\)_    problems/\1.o \\_' $^ >>$@
@@ -24,12 +26,12 @@ deps := $(objects_all:%.o=%.d)
 compilation_db := $(objects_all:%.o=%.json)
 test_lists := $(objects_all:%.o=%.tests)
 
-files_to_clean := $(objects_all) $(deps) $(compilation_db) $(test_lists) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h tests.txt
+files_to_clean := $(objects_all) $(deps) $(compilation_db) $(test_lists) $(generated_headers) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk tests.txt
 
-build: remove-old-files .WAIT generated_sources .WAIT compile_commands.json euler
-build_tests: remove-old-files .WAIT generated_sources .WAIT compile_commands.json unit_tests
+build: dev .WAIT euler
+build_tests: dev .WAIT unit_tests
 
-dev: remove-old-files .WAIT generated_sources compile_commands.json
+dev: remove-old-files .WAIT $(generated_headers) compile_commands.json
 
 clean: remove-old-files clean-local.mk
 	rm -fv $(files_to_clean)
@@ -56,11 +58,8 @@ run: build
 check: build_tests tests.txt
 	for t in $$(cat tests.txt); do ./unit_tests --test=$$t || exit $$?; done
 
-generated_sources: problems.h tests_list.h
-
 problems.h: problems.txt
 	sed -e '/^#/d' -e 's/\(.*\)/PROBLEM_DISPATCH(\1)/' $^ >$@
-
 tests_list.h: tests.txt
 	sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
 
@@ -101,4 +100,4 @@ local.mk:
 	touch $@
 
 -include $(deps)
-.PHONY: all build build_tests dev clean clean-local.mk install installdirs uninstall run check remove-old-files generated_sources
+.PHONY: all build build_tests dev clean clean-local.mk install installdirs uninstall run check remove-old-files
