@@ -1,4 +1,5 @@
 CC = gcc
+MAKEDEP = $(CC) $(CFLAGS_all) $(CPPFLAGS_all) -MM -MP -MF $@ $<
 
 ENABLE_ASSERTS = 0
 ENABLE_WARNINGS = 0
@@ -11,7 +12,6 @@ CFLAGS_warnings1 = -Wall -Wextra
 LDFLAGS =
 
 CPPFLAGS = -I.
-CPPFLAGS_deps = -MMD -MP
 CPPFLAGS_testing0 =
 CPPFLAGS_testing1 = -DTESTING
 CPPFLAGS_asserts0 = -DNDEBUG

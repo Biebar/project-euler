@@ -6,7 +6,7 @@ include defaults.mk
 
 LDFLAGS_all := $(LDFLAGS)
 CFLAGS_all := $(CFLAGS) $(CFLAGS_warnings$(ENABLE_WARNINGS))
-CPPFLAGS_all := $(CPPFLAGS_deps) $(CPPFLAGS_testing$(ENABLE_TESTING)) $(CPPFLAGS_asserts$(ENABLE_ASSERTS)) $(CPPFLAGS)
+CPPFLAGS_all := $(CPPFLAGS_testing$(ENABLE_TESTING)) $(CPPFLAGS_asserts$(ENABLE_ASSERTS)) $(CPPFLAGS)
 
 objects_lib = utils/divisibility.o utils/unequality.o utils/reductions.o utils/vec.o utils/bigint.o
 objects_exe = main.o
@@ -68,11 +68,13 @@ tests_list.h: tests.txt
 	sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
 
 .SUFFIXES:
-.SUFFIXES: .c .a .o .json .tests
+.SUFFIXES: .c .a .d .o .json .tests
 
 .c.o:
 	$(CC) $(CFLAGS_all) $(CPPFLAGS_all) -c -o $@ $<
 .o.a: ;
+.c.d:
+	$(MAKEDEP)
 
 tests.txt: $(test_lists)
 	sort -m $^ >$@
@@ -104,5 +106,6 @@ $(objects_all) $(compilation_db): defaults.mk local.mk
 local.mk:
 	touch $@
 
--include $(deps)
+$(deps): $(generated_headers)
+include $(deps)
 .PHONY: all build build_tests dev clean clean-local.mk install installdirs uninstall run check remove-old-files
