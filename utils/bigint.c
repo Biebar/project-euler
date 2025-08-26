@@ -48,6 +48,40 @@ void bigint_normalize(bigint *a)
 		--a->len;
 	}
 }
+static void bigint_lshift(bigint *x, int n)
+{
+	assert(n >= 0);
+	assert(n < 64);
+	uint64_t carry = 0;
+	for (size_t i = 0; i < x->len; ++i) {
+		uint64_t old = x->data[i];
+		x->data[i] = (old << n) | carry;
+		carry = old >> (64 - n);
+	}
+	if (carry)
+		*uvec_push(x) = carry;
+}
+static inline uint64_t bigint_nth_binary_digit(bigint x, size_t n)
+{
+	bool const is_one = x.data[n / 64] & ((uint64_t)1 << (n % 64));
+	return is_one;
+}
+static inline void
+bigint_set_nth_binary_digit(bigint *x, size_t n, uint64_t val)
+{
+	size_t const i = n / 64;
+	size_t const d = n % 64;
+	if (val) {
+		for (size_t j = x->len; j < i + 1; ++j)
+			*uvec_push(x) = 0;
+		x->data[i] |= (size_t)1 << d;
+	} else {
+		if (x->len > i) {
+			x->data[i] &= ~((size_t)1 << d);
+			bigint_normalize(x);
+		}
+	}
+}
 void bigint_sum(bigint *dest, bigint a, bigint b)
 {
 	bigint output = *dest;
@@ -77,24 +111,28 @@ void bigint_sum(bigint *dest, bigint a, bigint b)
 
 	*dest = output;
 }
-void bigint_diff(bigint *dest, bigint a, bigint b)
+static void bigint_diff_inplace(bigint *a, bigint b)
 {
-	assert(bigint_cmp(a, b) >= 0);
-	dest->len = 0;
+	assert(bigint_cmp(*a, b) >= 0);
 	uint64_t carry = 0;
 	for (size_t i = 0; i < b.len; ++i) {
 		uint64_t res;
-		carry = ckd_sub(&res, a.data[i], carry);
+		carry = ckd_sub(&res, a->data[i], carry);
 		carry += ckd_sub(&res, res, b.data[i]);
-		*uvec_push(dest) = res;
+		a->data[i] = res;
 	}
-	for (size_t i = b.len; i < a.len; ++i) {
+	for (size_t i = b.len; i < a->len; ++i) {
 		uint64_t res;
-		carry = ckd_sub(&res, a.data[i], carry);
-		*uvec_push(dest) = res;
+		carry = ckd_sub(&res, a->data[i], carry);
+		a->data[i] = res;
 	}
-	assert(!carry); // because a >= b
-	bigint_normalize(dest);
+	assert(!carry);
+	bigint_normalize(a);
+}
+void bigint_diff(bigint *dest, bigint a, bigint b)
+{
+	bigint_copy(dest, a);
+	bigint_diff_inplace(dest, b);
 }
 void bigint_add_monome(bigint *a, uint64_t b, size_t power)
 {
@@ -143,6 +181,21 @@ int bigint_cmp(bigint a, bigint b)
 			return 1;
 	}
 	return 0;
+}
+void bigint_div(bigint *quotient, bigint *remainder, bigint a, bigint b)
+{
+	assert(b.len > 0);
+	quotient->len = 0;
+	remainder->len = 0;
+	size_t const num_bin_digits = a.len * 64;
+	for (size_t i = num_bin_digits - 1; i != BIGINT_DIGIT_MAX; --i) {
+		bigint_lshift(remainder, 1);
+		bigint_set_nth_binary_digit(remainder, 0, bigint_nth_binary_digit(a, i));
+		if (bigint_cmp(*remainder, b) >= 0) {
+			bigint_diff_inplace(remainder, b);
+			bigint_set_nth_binary_digit(quotient, i, 1);
+		}
+	}
 }
 
 void bigint_copy(bigint *dest, bigint source)
@@ -341,6 +394,77 @@ TEST(normalized_bigint_zero_is_empty_vector)
 	bigint n = bigint_create(0);
 	bigint_normalize(&n);
 	TEST_ASSERT(n.len == 0);
+	TEST_COMPLETE();
+}
+TEST(bigint_lshift_zero_gives_zero)
+{
+	bigint n = {};
+	bigint_lshift(&n, 1);
+	TEST_ASSERT(n.len == 0);
+	TEST_COMPLETE();
+}
+TEST(bigint_div_zero_by_one_is_zero)
+{
+	bigint a = {};
+	bigint b = bigint_create(1);
+	bigint quot = {}, rem = {};
+	bigint_div(&quot, &rem, a, b);
+	TEST_ASSERT(quot.len == 0);
+	TEST_ASSERT(rem.len == 0);
+	TEST_COMPLETE();
+}
+TEST(bigint_div_one_by_one_is_one)
+{
+	bigint a = bigint_create(1);
+	bigint b = bigint_create(1);
+	bigint quot = {}, rem = {};
+	bigint_div(&quot, &rem, a, b);
+	TEST_ASSERT(quot.len == 1 && quot.data[0] == 1);
+	TEST_ASSERT(rem.len == 0);
+	TEST_COMPLETE();
+}
+TEST(bigint_div_4_by_2_is_2)
+{
+	bigint a = bigint_create(4);
+	bigint b = bigint_create(2);
+	bigint quot = {}, rem = {};
+	bigint_div(&quot, &rem, a, b);
+	TEST_ASSERT(quot.len == 1 && quot.data[0] == 2);
+	TEST_ASSERT(rem.len == 0);
+	TEST_COMPLETE();
+}
+TEST(bigint_div_5_by_2_is_2_plus_1)
+{
+	bigint a = bigint_create(5);
+	bigint b = bigint_create(2);
+	bigint quot = {}, rem = {};
+	bigint_div(&quot, &rem, a, b);
+	TEST_ASSERT(quot.len == 1 && quot.data[0] == 2);
+	TEST_ASSERT(rem.len == 1 && rem.data[0] == 1);
+	TEST_COMPLETE();
+}
+TEST(bigint_div_onezero_by_two_is_halfdigit)
+{
+	bigint a = {};
+	*uvec_push(&a) = 0;
+	*uvec_push(&a) = 1;
+	bigint b = bigint_create(2);
+	bigint quot = {}, rem = {};
+	bigint_div(&quot, &rem, a, b);
+	TEST_ASSERT(quot.len == 1 && quot.data[0] == half_num_digits);
+	TEST_ASSERT(rem.len == 0);
+	TEST_COMPLETE();
+}
+TEST(bigint_div_2_by_onezero_is_0_plus_2)
+{
+	bigint a = bigint_create(2);
+	bigint b = {};
+	*uvec_push(&b) = 0;
+	*uvec_push(&b) = 1;
+	bigint quot = {}, rem = {};
+	bigint_div(&quot, &rem, a, b);
+	TEST_ASSERT(quot.len == 0);
+	TEST_ASSERT(rem.len == 1 && rem.data[0] == 2);
 	TEST_COMPLETE();
 }
 #endif // TESTING

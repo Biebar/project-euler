@@ -12,6 +12,7 @@ int bigint_cmp(bigint a, bigint b);
 void bigint_sum(bigint *dest, bigint a, bigint b);
 void bigint_diff(bigint *dest, bigint a, bigint b);
 void bigint_copy(bigint *dest, bigint source);
+void bigint_div(bigint *quotient, bigint *remainder, bigint a, bigint b);
 inline bigint bigint_create(uint64_t value)
 {
 	bigint ret = {};
