@@ -24,7 +24,7 @@ deps := $(objects_all:%.o=%.d)
 compilation_db := $(objects_all:%.o=%.json)
 test_lists := $(objects_all:%.o=%.tests)
 
-files_all := $(objects_all) $(deps) $(compilation_db) $(test_lists) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h tests.txt
+files_to_clean := $(objects_all) $(deps) $(compilation_db) $(test_lists) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk problems.h tests_list.h tests.txt
 
 build: remove-old-files .WAIT generated_sources .WAIT compile_commands.json euler
 build_tests: remove-old-files .WAIT generated_sources .WAIT compile_commands.json unit_tests
@@ -32,7 +32,7 @@ build_tests: remove-old-files .WAIT generated_sources .WAIT compile_commands.jso
 dev: remove-old-files .WAIT generated_sources compile_commands.json
 
 clean: remove-old-files clean-local.mk
-	rm -fv $(files_all)
+	rm -fv $(files_to_clean)
 clean-local.mk:
 	[ ! -f local.mk -o -s local.mk ] || rm -fv local.mk
 
@@ -91,7 +91,7 @@ compile_commands.json: .compile_commands.json.tmp
 
 remove-old-files: .generated_files.txt
 .generated_files.txt: Makefile problems.mk
-	@for file in $(files_all); do echo "$$file" ; done | sort >$@.tmp
+	@for file in $(files_to_clean); do echo "$$file" ; done | sort >$@.tmp
 	@touch $@
 	rm -fv $$(comm -13 $@.tmp $@)
 	@mv $@.tmp $@
