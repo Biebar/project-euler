@@ -15,7 +15,8 @@ void bigint_copy(bigint *dest, bigint source);
 inline bigint bigint_create(uint64_t value)
 {
 	bigint ret = {};
-	*uvec_push(&ret) = value;
+	if (value)
+		*uvec_push(&ret) = value;
 	return ret;
 }
 inline void bigint_destroy(bigint *x)

@@ -304,7 +304,8 @@ TEST(sub_bigint_by_itself_returns_zero)
 TEST(sub_bigint_may_carry)
 {
 	bigint res = {};
-	bigint a = bigint_create(0);
+	bigint a = {};
+	*uvec_push(&a) = 0;
 	*uvec_push(&a) = 1;
 	bigint b = bigint_create(1);
 	bigint_diff(&res, a, b);
@@ -315,7 +316,8 @@ TEST(sub_bigint_may_carry)
 TEST(sub_bigint_may_carry_over_multiple_digits)
 {
 	bigint res = {};
-	bigint a = bigint_create(0);
+	bigint a = {};
+	*uvec_push(&a) = 0;
 	*uvec_push(&a) = 0;
 	*uvec_push(&a) = 1;
 	bigint b = bigint_create(1);
@@ -327,7 +329,8 @@ TEST(sub_bigint_may_carry_over_multiple_digits)
 }
 TEST(normalizing_normalized_bigint_does_nothing)
 {
-	bigint n = bigint_create(0);
+	bigint n = {};
+	*uvec_push(&n) = 0;
 	*uvec_push(&n) = 1;
 	bigint_normalize(&n);
 	TEST_ASSERT(n.len == 2);
