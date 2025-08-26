@@ -26,7 +26,7 @@ deps := $(objects_all:%.o=%.d)
 compilation_db := $(objects_all:%.o=%.json)
 test_lists := $(objects_all:%.o=%.tests)
 
-files_to_clean := $(objects_all) $(deps) $(compilation_db) $(test_lists) $(generated_headers) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk tests.txt
+files_to_clean := $(objects_all) $(deps) $(compilation_db) $(test_lists) $(generated_headers) euler unit_tests compile_commands.json .compile_commands.json.tmp .generated_files.txt problems.mk tests.txt lib.a problems.a
 
 build: dev .WAIT euler
 build_tests: dev .WAIT unit_tests
@@ -47,11 +47,15 @@ installdirs:
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/euler
 
-euler: $(objects_exe) $(objects_lib) $(objects_problems)
-unit_tests: $(objects_test) $(objects_lib) $(objects_problems)
-
+euler: $(objects_exe) lib.a problems.a
+unit_tests: $(objects_test) lib.a problems.a
 euler unit_tests:
 	$(CC) $(CFLAGS_all) $(LDFLAGS_all) -o $@ $^
+
+lib.a: lib.a($(objects_lib))
+problems.a: problems.a($(objects_problems))
+lib.a problems.a:
+	$(AR) $(ARFLAGS) $@ $?
 
 run: build
 	./euler
@@ -64,10 +68,11 @@ tests_list.h: tests.txt
 	sed -e '/^#/d' -e 's/\(.*\)/TEST_DISPATCH(\1)/' $^ >$@
 
 .SUFFIXES:
-.SUFFIXES: .c .o .json .tests
+.SUFFIXES: .c .a .o .json .tests
 
 .c.o:
 	$(CC) $(CFLAGS_all) $(CPPFLAGS_all) -c -o $@ $<
+.o.a: ;
 
 tests.txt: $(test_lists)
 	sort -m $^ >$@
